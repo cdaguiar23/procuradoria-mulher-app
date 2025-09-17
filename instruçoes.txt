@@ -1,0 +1,80 @@
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Shield, Users, FileText, BookOpen } from 'lucide-react';
+import Link from 'next/link';
+import { Logo } from '@/components/Logo';
+
+const features = [
+  {
+    title: 'Denúncia Anônima',
+    description: 'Faça uma denúncia de forma segura e anônima. Sua identidade será protegida.',
+    icon: <Shield className="w-10 h-10 text-primary" />,
+    href: '/denuncia',
+    cta: 'Fazer Denúncia'
+  },
+  {
+    title: 'Rede de Proteção',
+    description: 'Conheça os órgãos e serviços que compõem a rede de apoio à mulher em Canelinha.',
+    icon: <Users className="w-10 h-10 text-primary" />,
+    href: '/rede-de-protecao',
+    cta: 'Conhecer a Rede'
+  },
+  {
+    title: 'Conheça Seus Direitos',
+    description: 'Informações sobre a Lei Maria da Penha e outros direitos que protegem as mulheres.',
+    icon: <BookOpen className="w-10 h-10 text-primary" />,
+    href: '/direitos',
+    cta: 'Saber Mais'
+  },
+  {
+    title: 'B.O. Online',
+    description: 'Registre um boletim de ocorrência de forma online através da Delegacia Virtual.',
+    icon: <FileText className="w-10 h-10 text-primary" />,
+    href: '/boletim-de-ocorrencia',
+    cta: 'Registrar Agora',
+    external: false
+  }
+];
+
+export default function Home() {
+  return (
+    <>
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <h1 className="text-4xl md:text-5xl font-headline font-bold tracking-tight text-primary">
+          Procuradoria Especial da Mulher de Canelinha
+        </h1>
+        <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80 font-body">
+          Um espaço seguro de apoio, informação e proteção para todas as mulheres de Canelinha. Estamos aqui para ajudar.
+        </p>
+        <div className="mt-8 flex justify-center">
+          <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+            <Link href="/denuncia">Precisa de Ajuda? Fale Conosco</Link>
+          </Button>
+        </div>
+      </section>
+
+      <section className="bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature) => (
+              <Card key={feature.title} className="text-center flex flex-col items-center p-6 hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="items-center p-2">
+                  {feature.icon}
+                  <CardTitle className="font-headline pt-4">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <p className="text-muted-foreground font-body">{feature.description}</p>
+                </CardContent>
+                <Button asChild variant="outline" className="mt-4 border-primary text-primary hover:bg-primary/10 hover:text-primary">
+                  <Link href={feature.href} target={feature.external ? '_blank' : undefined} rel={feature.external ? 'noopener noreferrer' : undefined}>
+                    {feature.cta}
+                  </Link>
+                </Button>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
