@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 
 
 import { Shield } from 'lucide-react-native';
@@ -22,6 +22,7 @@ const HomeScreen = ({ navigation }: Props) => {
 
 
       <View style={styles.header}>
+        <Image source={require('../../assets/logo_procuradoria.png')} style={styles.logo} />
         <Text style={[styles.title, { color: primaryColor }]}>
           Procuradoria Especial da Mulher de Canelinha
         </Text>
@@ -59,6 +60,12 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     textAlign: 'center',
+  },
+  logo: {
+    width: 200,
+    height: 100,
+    marginBottom: 10,
+    resizeMode: 'contain',
   },
   title: {
     fontSize: 28,
