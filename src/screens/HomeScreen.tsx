@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 
 
-import { Shield } from 'lucide-react-native';
+import { Shield, Users, BookOpen, FileText } from 'lucide-react-native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
 
@@ -42,6 +42,39 @@ const HomeScreen = ({ navigation }: Props) => {
         </Text>
         <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Denúncia')}>
           <Text style={[styles.cardButtonText, { color: primaryColor }]}>Fazer Denúncia</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+        <Users color={primaryColor} size={40} />
+        <Text style={[styles.cardTitle, { color: primaryColor }]}>Rede de Apoio</Text>
+        <Text style={[styles.cardDescription, { color: lightTextColor }]}>
+          Conecte-se com serviços de apoio e organizações que ajudam mulheres em situação de vulnerabilidade.
+        </Text>
+        <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Rede')}>
+          <Text style={[styles.cardButtonText, { color: primaryColor }]}>Acessar Rede</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+        <BookOpen color={primaryColor} size={40} />
+        <Text style={[styles.cardTitle, { color: primaryColor }]}>Direitos da Mulher</Text>
+        <Text style={[styles.cardDescription, { color: lightTextColor }]}>
+          Informações sobre os direitos das mulheres e como exercê-los.
+        </Text>
+        <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Direitos')}>
+          <Text style={[styles.cardButtonText, { color: primaryColor }]}>Ver Direitos</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+        <FileText color={primaryColor} size={40} />
+        <Text style={[styles.cardTitle, { color: primaryColor }]}>B.O.</Text>
+        <Text style={[styles.cardDescription, { color: lightTextColor }]}>
+          Saiba como registrar um Boletim de Ocorrência de forma segura.
+        </Text>
+        <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('B.O.')}>
+          <Text style={[styles.cardButtonText, { color: primaryColor }]}>Registrar B.O.</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
