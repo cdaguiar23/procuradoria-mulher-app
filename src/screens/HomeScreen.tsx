@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+
+
 import { Shield } from 'lucide-react-native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
@@ -17,6 +19,8 @@ const HomeScreen = ({ navigation }: Props) => {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: backgroundColor }]}>
+
+
       <View style={styles.header}>
         <Text style={[styles.title, { color: primaryColor }]}>
           Procuradoria Especial da Mulher de Canelinha
@@ -43,10 +47,14 @@ const HomeScreen = ({ navigation }: Props) => {
   );
 };
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 50,
   },
+
   header: {
     padding: 20,
     alignItems: 'center',
