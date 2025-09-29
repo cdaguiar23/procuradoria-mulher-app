@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
 
@@ -14,9 +13,6 @@ const DenunciaScreen = (props: Props) => {
     </View>
   );
 };
-
-
-
 
 const styles = StyleSheet.create({
   container: {

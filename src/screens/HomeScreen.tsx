@@ -1,11 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 
-
 import { Shield, Users, BookOpen, FileText } from 'lucide-react-native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
-
 
 type Props = BottomTabScreenProps<RootTabParamList, 'Início'>;
 
@@ -19,7 +17,6 @@ const HomeScreen = ({ navigation }: Props) => {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: backgroundColor }]}>
-
 
       <View style={styles.header}>
         <Image source={require('../../assets/logo_procuradoria.png')} style={styles.logo} />
@@ -80,8 +77,6 @@ const HomeScreen = ({ navigation }: Props) => {
     </ScrollView>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   container: {
