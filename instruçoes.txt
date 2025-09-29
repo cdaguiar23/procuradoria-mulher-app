@@ -1,33 +1,101 @@
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Phone, MapPin, Clock } from 'lucide-react';
 
-export default function BoletimDeOcorrenciaPage() {
+const partners = [
+  {
+    name: "Procuradoria Especial da Mulher de Canelinha",
+    value: "procuradoria",
+    services: [
+      "Acolhimento e orientação",
+      "Encaminhamento para serviços da rede",
+      "Apoio jurídico e psicológico"
+    ],
+    address: "Rua Manoel Francisco Correa, 417, Centro, Canelinha/SC",
+    phone: "(48) 3264-0033",
+    hours: "Segunda a Sexta, 08h - 12h e 14h - 17h"
+  },
+  {
+    name: "Polícia Militar",
+    value: "pm",
+    services: [
+      "Atendimento emergencial",
+      "Patrulha Maria da Penha",
+      "Medidas protetivas de urgência"
+    ],
+    address: "Disque 190 para emergências",
+    phone: "190",
+    hours: "24 horas por dia"
+  },
+  {
+    name: "Polícia Civil",
+    value: "pc",
+    services: [
+      "Registro de Boletim de Ocorrência",
+      "Investigação de crimes",
+      "Solicitação de medidas protetivas"
+    ],
+    address: "Rua Avelina Bastos, 400, Centro, Canelinha/SC",
+    phone: "(48) 3665-4796",
+    hours: "Horário comercial"
+  }
+];
+
+export default function RedeDeProtecaoPage() {
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="max-w-3xl mx-auto text-center">
-        <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary mb-8">
-          Boletim de Ocorrência Online
-        </h1>
-        <div className="bg-card p-8 rounded-lg shadow-lg text-left space-y-6">
-          <p className="text-lg font-body text-foreground/80 leading-relaxed">
-            A Delegacia Virtual da Polícia Civil de Santa Catarina (Delegacia Virtual de SC) é um serviço para o registro de ocorrências policiais pela internet, 24 horas por dia, todos os dias da semana.
+    <div className="bg-background">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">
+            Rede de Proteção
+          </h1>
+          <p className="mt-4 max-w-3xl mx-auto text-lg text-foreground/80 font-body">
+            Você não está sozinha. Conheça as instituições em Canelinha e região que oferecem suporte, acolhimento e proteção para mulheres em situação de violência.
           </p>
-          <p className="text-lg font-body text-foreground/80 leading-relaxed">
-            Este canal permite o registro de crimes como ameaça, calúnia, injúria, difamação, furto, estelionato, danos, desaparecimento de pessoas, entre outros. 
-          </p>
-          <p className="font-bold text-primary text-lg">
-            Em casos de emergência, como violência doméstica em andamento ou qualquer crime que esteja acontecendo, ligue imediatamente para o 190 (Polícia Militar).
-          </p>
-          <div className="text-center pt-4">
-            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Link href="https://www.delegaciavirtual.sc.gov.br/" target="_blank" rel="noopener noreferrer">
-                Ir para a Delegacia Virtual
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
         </div>
+
+        <Tabs defaultValue="procuradoria" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto">
+            {partners.map(partner => (
+              <TabsTrigger key={partner.value} value={partner.value} className="text-xs sm:text-sm">
+                {partner.name === "Procuradoria Especial da Mulher de Canelinha" ? "Procuradoria" : partner.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {partners.map(partner => (
+            <TabsContent key={partner.value} value={partner.value}>
+              <Card className="mt-4">
+                <CardHeader>
+                  <CardTitle className="font-headline text-2xl text-accent">{partner.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="font-bold font-headline text-lg mb-2 text-primary">Serviços Oferecidos</h3>
+                    <ul className="list-disc list-inside space-y-1 text-base text-foreground/80 font-body">
+                      {partner.services.map(service => <li key={service}>{service}</li>)}
+                    </ul>
+                  </div>
+                  <div className="border-t pt-4 space-y-2 text-base font-body">
+                     <h3 className="font-bold font-headline text-lg mb-2 text-primary">Contato e Localização</h3>
+                    <div className="flex items-start gap-3">
+                      <MapPin className="w-5 h-5 mt-1 text-primary shrink-0" />
+                      <span>{partner.address}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-5 h-5 text-primary shrink-0" />
+                      <span>{partner.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-5 h-5 text-primary shrink-0" />
+                      <span>{partner.hours}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
+        </Tabs>
+
       </div>
     </div>
   );
