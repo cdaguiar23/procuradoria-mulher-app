@@ -114,7 +114,7 @@ const RedeScreen = (props: Props) => {
               <Text style={[styles.phoneText, { color: primaryColor }]}>(48) 3433-0000</Text>
             </TouchableOpacity>
             <Text style={[styles.address, { color: lightTextColor }]}>
-              Rua Manoel José Pedroso, 200 - Centro, Canelinha/SC
+              Rua Manoel Francisco Pereira, 417 - Centro, Canelinha/SC
             </Text>
           </View>
         </ScrollView>
