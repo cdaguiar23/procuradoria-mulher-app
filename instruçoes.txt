@@ -1,102 +1,397 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Phone, MapPin, Clock } from 'lucide-react';
+"use client";
 
-const partners = [
-  {
-    name: "Procuradoria Especial da Mulher de Canelinha",
-    value: "procuradoria",
-    services: [
-      "Acolhimento e orientação",
-      "Encaminhamento para serviços da rede",
-      "Apoio jurídico e psicológico"
-    ],
-    address: "Rua Manoel Francisco Correa, 417, Centro, Canelinha/SC",
-    phone: "(48) 3264-0033",
-    hours: "Segunda a Sexta, 08h - 12h e 14h - 17h"
-  },
-  {
-    name: "Polícia Militar",
-    value: "pm",
-    services: [
-      "Atendimento emergencial",
-      "Patrulha Maria da Penha",
-      "Medidas protetivas de urgência"
-    ],
-    address: "Disque 190 para emergências",
-    phone: "190",
-    hours: "24 horas por dia"
-  },
-  {
-    name: "Polícia Civil",
-    value: "pc",
-    services: [
-      "Registro de Boletim de Ocorrência",
-      "Investigação de crimes",
-      "Solicitação de medidas protetivas"
-    ],
-    address: "Rua Avelina Bastos, 400, Centro, Canelinha/SC",
-    phone: "(48) 3665-4796",
-    hours: "Horário comercial"
-  }
+import { useFormState, useFormStatus } from "react-dom";
+import { useEffect, useState, useRef, useCallback } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { submitDenuncia } from "@/app/(main)/denuncia/actions";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Loader2, Camera, Mic, Trash2, Upload, FileAudio, FileVideo, Video } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
+import Image from 'next/image';
+
+const abuseTypes = [
+  { id: "psicologica", label: "Psicológica" },
+  { id: "moral", label: "Moral" },
+  { id: "patrimonial", label: "Patrimonial" },
+  { id: "fisica", label: "Física" },
+  { id: "sexual", label: "Sexual" },
 ];
 
-export default function RedeDeProtecaoPage() {
+const initialState = {
+  message: null,
+  errors: {},
+  recommendations: null,
+};
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
   return (
-    <div className="bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">
-            Rede de Proteção
-          </h1>
-          <p className="mt-4 max-w-3xl mx-auto text-lg text-foreground/80 font-body">
-            Você não está sozinha. Conheça as instituições em Canelinha e região que oferecem suporte, acolhimento e proteção para mulheres em situação de violência.
-          </p>
-        </div>
+    <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={pending}>
+      {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Enviando...
+        </>
+      ) : (
+        "Enviar Denúncia e Ver Recomendações"
+      )}
+    </Button>
+  );
+}
 
-        <Tabs defaultValue="procuradoria" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto">
-            {partners.map(partner => (
-              <TabsTrigger key={partner.value} value={partner.value} className="text-xs sm:text-sm">
-                {partner.name === "Procuradoria Especial da Mulher de Canelinha" ? "Procuradoria" : partner.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {partners.map(partner => (
-            <TabsContent key={partner.value} value={partner.value}>
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl text-accent">{partner.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h3 className="font-bold font-headline text-lg mb-2 text-primary">Serviços Oferecidos</h3>
-                    <ul className="list-disc list-inside space-y-1 text-base text-foreground/80 font-body">
-                      {partner.services.map(service => <li key={service}>{service}</li>)}
-                    </ul>
-                  </div>
-                  <div className="border-t pt-4 space-y-2 text-base font-body">
-                     <h3 className="font-bold font-headline text-lg mb-2 text-primary">Contato e Localização</h3>
-                    <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 mt-1 text-primary shrink-0" />
-                      <span>{partner.address}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Phone className="w-5 h-5 text-primary shrink-0" />
-                      <span>{partner.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Clock className="w-5 h-5 text-primary shrink-0" />
-                      <span>{partner.hours}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          ))}
-        </Tabs>
+export function DenunciaForm() {
+  const [state, formAction] = useFormState(submitDenuncia, initialState);
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isCameraOpen, setCameraOpen] = useState(false);
+  const [cameraMode, setCameraMode] = useState<'photo' | 'video'>('photo');
+  const [mediaDataUri, setMediaDataUri] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<'image' | 'audio' | 'video' | null>(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
 
-      </div>
-    </div>
+  const formRef = useRef<HTMLFormElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const mediaChunksRef = useRef<Blob[]>([]);
+  const { toast } = useToast();
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUri = e.target?.result as string;
+        setMediaDataUri(dataUri);
+        if (file.type.startsWith('image/')) setMediaType('image');
+        else if (file.type.startsWith('audio/')) setMediaType('audio');
+        else if (file.type.startsWith('video/')) setMediaType('video');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const stopCameraStream = useCallback(() => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+  }, []);
+  
+  const openCamera = (mode: 'photo' | 'video') => {
+    setCameraMode(mode);
+    setCameraOpen(true);
+  }
+
+  const closeCamera = () => {
+    stopCameraStream();
+    setCameraOpen(false);
+    if(isRecording){
+      stopRecording();
+    }
+  }
+
+  useEffect(() => {
+    if (isCameraOpen) {
+      const getCameraPermission = async () => {
+        try {
+          const constraints = cameraMode === 'video' ? { video: true, audio: true } : { video: true };
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          setHasCameraPermission(true);
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+          if (cameraMode === 'video') {
+            startVideoRecording(stream);
+          }
+        } catch (error) {
+          console.error("Error accessing camera/mic:", error);
+          setHasCameraPermission(false);
+          setCameraOpen(false);
+          toast({
+            variant: "destructive",
+            title: "Acesso a mídia negado",
+            description: "Por favor, habilite a permissão da câmera (e microfone para vídeo) no seu navegador.",
+          });
+        }
+      };
+      getCameraPermission();
+    } else {
+      stopCameraStream();
+    }
+
+    return () => {
+      stopCameraStream();
+    };
+  }, [isCameraOpen, cameraMode, toast, stopCameraStream]);
+  
+  const takePhoto = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement("canvas");
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const context = canvas.getContext("2d");
+      if (context) {
+        context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+        const dataUri = canvas.toDataURL("image/jpeg");
+        setMediaDataUri(dataUri);
+        setMediaType('image');
+        closeCamera();
+      }
+    }
+  };
+
+  const startAudioRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      mediaChunksRef.current = [];
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        mediaChunksRef.current.push(event.data);
+      };
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(mediaChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setMediaDataUri(e.target?.result as string);
+          setMediaType('audio');
+        };
+        reader.readAsDataURL(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Acesso ao microfone negado",
+        description: "Por favor, habilite a permissão do microfone.",
+      });
+    }
+  };
+
+  const startVideoRecording = (stream: MediaStream) => {
+    try {
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      mediaChunksRef.current = [];
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        mediaChunksRef.current.push(event.data);
+      };
+      mediaRecorderRef.current.onstop = () => {
+        const videoBlob = new Blob(mediaChunksRef.current, { type: 'video/webm' });
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setMediaDataUri(e.target?.result as string);
+          setMediaType('video');
+        };
+        reader.readAsDataURL(videoBlob);
+      };
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (e) {
+       console.error("Error starting video recording:", e);
+       toast({
+         variant: "destructive",
+         title: "Erro na gravação",
+         description: "Não foi possível iniciar a gravação do vídeo.",
+       });
+    }
+  };
+
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (cameraMode === 'video') {
+        closeCamera();
+      }
+    }
+  };
+  
+  const clearMedia = () => {
+    setMediaDataUri(null);
+    setMediaType(null);
+    const fileInput = document.getElementById('media-input') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  };
+
+  useEffect(() => {
+    if (state.recommendations) {
+      setDialogOpen(true);
+      formRef.current?.reset();
+      clearMedia();
+    }
+  }, [state]);
+
+  return (
+    <>
+      <Card>
+        <form ref={formRef} action={formAction}>
+          <input type="hidden" name="mediaDataUri" value={mediaDataUri || ""} />
+          <CardHeader>
+            <CardTitle className="font-headline">Formulário de Denúncia</CardTitle>
+            <CardDescription>
+              Preencha os campos abaixo. Todas as informações são confidenciais.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label className="font-bold text-base">
+                Tipo de Violência (selecione uma)
+              </Label>
+              <RadioGroup name="abuseType" id="abuseType" className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-2">
+                {abuseTypes.map((type) => (
+                  <div key={type.id} className="flex items-center space-x-2">
+                    <RadioGroupItem value={type.id} id={type.id} />
+                    <Label htmlFor={type.id} className="font-normal cursor-pointer text-base">{type.label}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+              {state.errors?.abuseType && (
+                <p className="text-sm font-medium text-destructive pt-2">
+                  {state.errors.abuseType[0]}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="complaintDetails" className="font-bold text-base">Relato</Label>
+              <Textarea
+                id="complaintDetails"
+                name="complaintDetails"
+                placeholder="Descreva a situação com o máximo de detalhes possível. Não inclua informações que possam te identificar."
+                rows={8}
+              />
+              {state.errors?.complaintDetails && (
+                <p className="text-sm font-medium text-destructive pt-2">
+                  {state.errors.complaintDetails[0]}
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-4">
+              <Label className="font-bold text-base">Anexos (Opcional)</Label>
+              <div className="p-4 border-2 border-dashed rounded-lg text-center">
+                {!mediaDataUri && !isCameraOpen && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 justify-center">
+                    <Button type="button" variant="outline" onClick={() => document.getElementById('media-input')?.click()}>
+                      <Upload className="mr-2" /> Anexar
+                    </Button>
+                    <input type="file" id="media-input" accept="image/*,audio/*,video/*" className="hidden" onChange={handleFileChange} />
+                    <Button type="button" variant="outline" onClick={() => openCamera('photo')}>
+                      <Camera className="mr-2" /> Foto
+                    </Button>
+                     <Button type="button" variant="outline" onClick={() => openCamera('video')}>
+                      <Video className="mr-2" /> Gravar Vídeo
+                    </Button>
+                    {isRecording && cameraMode !== 'video' ? (
+                      <Button type="button" variant="destructive" onClick={stopRecording}>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parar Áudio
+                      </Button>
+                    ) : (
+                      <Button type="button" variant="outline" onClick={startAudioRecording} disabled={isRecording}>
+                        <Mic className="mr-2" /> Gravar Áudio
+                      </Button>
+                    )}
+                  </div>
+                )}
+                
+                {mediaDataUri && (
+                   <div className="relative max-w-sm mx-auto">
+                    {mediaType === 'image' && <Image src={mediaDataUri} alt="Preview" width={200} height={200} className="rounded-md mx-auto" />}
+                    {mediaType === 'audio' && (
+                        <div className="flex flex-col items-center gap-2">
+                            <FileAudio className="w-16 h-16 text-primary" />
+                            <p className="text-sm text-muted-foreground">Áudio anexado</p>
+                            <audio src={mediaDataUri} controls className="w-full" />
+                        </div>
+                    )}
+                     {mediaType === 'video' && (
+                        <div className="flex flex-col items-center gap-2">
+                            <FileVideo className="w-16 h-16 text-primary" />
+                            <p className="text-sm text-muted-foreground">Vídeo anexado</p>
+                            <video src={mediaDataUri} controls className="w-full rounded-md" />
+                        </div>
+                    )}
+                    <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 rounded-full h-8 w-8" onClick={clearMedia}>
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                   </div>
+                )}
+
+                {isCameraOpen && (
+                   <div>
+                     <video ref={videoRef} className="w-full aspect-video rounded-md bg-black" autoPlay muted playsInline />
+                     {hasCameraPermission === false && (
+                       <Alert variant="destructive" className="mt-2">
+                         <AlertTitle>Acesso à Câmera Negado</AlertTitle>
+                         <AlertDescription>
+                           Permita o acesso à câmera nas configurações do seu navegador para usar este recurso.
+                         </AlertDescription>
+                       </Alert>
+                     )}
+                     <div className="flex justify-center gap-2 mt-4">
+                       {cameraMode === 'photo' && <Button type="button" onClick={takePhoto} disabled={!hasCameraPermission}>Capturar Foto</Button>}
+                       {cameraMode === 'video' && isRecording && <Button type="button" variant="destructive" onClick={stopRecording}>Parar Gravação</Button>}
+                       <Button type="button" variant="ghost" onClick={closeCamera}>Cancelar</Button>
+                     </div>
+                   </div>
+                )}
+
+              </div>
+            </div>
+
+            {state.message && !state.recommendations && (
+                <Alert variant="destructive">
+                    <AlertTitle>Erro</AlertTitle>
+                    <AlertDescription>{state.message}</AlertDescription>
+                </Alert>
+            )}
+          </CardContent>
+          <CardFooter>
+            <SubmitButton />
+          </CardFooter>
+        </form>
+      </Card>
+
+      <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] md:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-headline text-primary text-2xl">Recomendações</DialogTitle>
+            <DialogDescription>
+              Com base no seu relato, aqui estão algumas sugestões e recursos que podem te ajudar.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 font-body leading-relaxed text-foreground/90 max-h-[50vh] overflow-y-auto">
+            {state.recommendations}
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+                <Button>Fechar</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
