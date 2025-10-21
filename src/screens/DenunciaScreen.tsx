@@ -14,6 +14,7 @@ import {
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
 import * as ImagePicker from 'expo-image-picker';
+import * as MailComposer from 'expo-mail-composer';
 import { RadioGroup } from 'react-native-radio-buttons-group';
 import ModalComponent from 'react-native-modal';
 import Toast from 'react-native-toast-message';
@@ -127,16 +128,41 @@ const DenunciaScreen = (props: Props) => {
       return;
     }
     setIsSubmitting(true);
-    // Simulate submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setRecommendations('Com base no seu relato, recomendamos procurar ajuda profissional. Entre em contato com a polícia ou serviços de apoio.');
-      setIsModalVisible(true);
+
+    try {
+      const emailBody = `
+Tipo de Violência: ${abuseTypes.find(type => type.id === abuseType)?.label}
+Relato: ${complaintDetails}
+      `.trim();
+
+      const attachments = mediaUri ? [mediaUri] : [];
+
+      await MailComposer.composeAsync({
+        recipients: ['informatica@camaracanelinha.gov.br'],
+        subject: 'Denúncia - Procuradoria da Mulher',
+        body: emailBody,
+        attachments: attachments,
+      });
+
+      Toast.show({
+        type: 'success',
+        text1: 'Sucesso',
+        text2: 'Denúncia enviada com sucesso!',
+      });
+
       // Reset form
       setAbuseType('');
       setComplaintDetails('');
       clearMedia();
-    }, 2000);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'Falha ao enviar denúncia. Tente novamente.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const closeModal = () => {
