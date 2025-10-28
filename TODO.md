@@ -8,4 +8,6 @@
   - [x] Add submit button with loading state
   - [x] Implement modal for recommendations
   - [x] Add toast notifications
-- [ ] Test the screen functionality
+- [x] Implement local storage for protocols using AsyncStorage
+- [ ] Test the screen functionality including email sending and local storage
+- [ ] Create a screen to view stored protocols

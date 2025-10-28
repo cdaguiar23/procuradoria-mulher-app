@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,19 +6,20 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Modal,
   Alert,
   Image,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
 import * as ImagePicker from 'expo-image-picker';
-import * as MailComposer from 'expo-mail-composer';
-import { RadioGroup } from 'react-native-radio-buttons-group';
+import { getInfoAsync, readAsStringAsync } from 'expo-file-system/legacy';
+import emailjs from '@emailjs/react-native';
 import ModalComponent from 'react-native-modal';
 import Toast from 'react-native-toast-message';
-import { Camera, Mic, Trash2, Upload, FileAudio, FileVideo, Video, Loader2 } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Camera, Mic, Trash2, Upload, Video } from 'lucide-react-native';
 
 type Props = BottomTabScreenProps<RootTabParamList, 'Denúncia'>;
 
@@ -135,19 +136,55 @@ Tipo de Violência: ${abuseTypes.find(type => type.id === abuseType)?.label}
 Relato: ${complaintDetails}
       `.trim();
 
-      const attachments = mediaUri ? [mediaUri] : [];
+      // Generate protocol number
+      const protocol = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
 
-      await MailComposer.composeAsync({
-        recipients: ['informatica@camaracanelinha.gov.br'],
+      let attachmentBase64 = null;
+      if (mediaUri && Platform.OS !== 'web') {
+        const fileInfo = await getInfoAsync(mediaUri);
+        if (fileInfo.exists) {
+          attachmentBase64 = await readAsStringAsync(mediaUri, {
+            encoding: 'base64',
+          });
+        }
+      }
+
+      const templateParams = {
+        to_email: 'cdaguiar23@gmail.com',
         subject: 'Denúncia - Procuradoria da Mulher',
-        body: emailBody,
-        attachments: attachments,
-      });
+        message: emailBody,
+        attachment: attachmentBase64 ? `data:${mediaType === 'image' ? 'image/jpeg' : mediaType === 'video' ? 'video/mp4' : 'audio/mpeg'};base64,${attachmentBase64}` : null,
+      };
+
+      // Note: Replace with your actual EmailJS service ID, template ID, and public key
+      await emailjs.send(
+        'service_fupehjx',
+        'template_xlepue8',
+        templateParams,
+        {
+          publicKey: '2IWzzSj591-UZ11lD',
+        }
+      );
+
+      // Save protocol to local storage
+      const protocolData = {
+        id: protocol,
+        abuseType: abuseTypes.find(type => type.id === abuseType)?.label,
+        complaintDetails,
+        mediaType,
+        date: new Date().toISOString(),
+        status: 'Enviado',
+      };
+
+      const existingProtocols = await AsyncStorage.getItem('protocols');
+      const protocols = existingProtocols ? JSON.parse(existingProtocols) : [];
+      protocols.push(protocolData);
+      await AsyncStorage.setItem('protocols', JSON.stringify(protocols));
 
       Toast.show({
         type: 'success',
         text1: 'Sucesso',
-        text2: 'Denúncia enviada com sucesso!',
+        text2: `Protocolo ${protocol} criado com sucesso`,
       });
 
       // Reset form
@@ -155,6 +192,7 @@ Relato: ${complaintDetails}
       setComplaintDetails('');
       clearMedia();
     } catch (error) {
+      console.error('Erro ao enviar email:', error);
       Toast.show({
         type: 'error',
         text1: 'Erro',
