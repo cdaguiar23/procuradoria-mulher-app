@@ -15,11 +15,13 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
 import * as ImagePicker from 'expo-image-picker';
 import { getInfoAsync, readAsStringAsync } from 'expo-file-system/legacy';
-import emailjs from '@emailjs/react-native';
+import { send } from '@emailjs/react-native';
 import ModalComponent from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Camera, Mic, Trash2, Upload, Video } from 'lucide-react-native';
+
+
 
 type Props = BottomTabScreenProps<RootTabParamList, 'Denúncia'>;
 
@@ -150,19 +152,19 @@ Relato: ${complaintDetails}
       }
 
       const templateParams = {
-        to_email: 'cdaguiar23@gmail.com',
+        to_email: 'informatica@camaracanelinha.sc.gov.br',
         subject: 'Denúncia - Procuradoria da Mulher',
         message: emailBody,
         attachment: attachmentBase64 ? `data:${mediaType === 'image' ? 'image/jpeg' : mediaType === 'video' ? 'video/mp4' : 'audio/mpeg'};base64,${attachmentBase64}` : null,
       };
 
       // Note: Replace with your actual EmailJS service ID, template ID, and public key
-      await emailjs.send(
+      await send(
         'service_fupehjx',
         'template_xlepue8',
         templateParams,
         {
-          publicKey: '2IWzzSj591-UZ11lD',
+          publicKey: '2IWzzSj591-UZ11lD'
         }
       );
 
