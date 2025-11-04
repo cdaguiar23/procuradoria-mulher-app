@@ -50,6 +50,8 @@ const DenunciaScreen = (props: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [recommendations, setRecommendations] = useState('');
+  const [searchProtocol, setSearchProtocol] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   const radioButtons = abuseTypes.map((type) => ({
     id: type.id,
@@ -126,7 +128,9 @@ const DenunciaScreen = (props: Props) => {
       Toast.show({
         type: 'error',
         text1: 'Erro',
+        text1Style: { fontSize: 18 },
         text2: 'Preencha todos os campos obrigatórios.',
+        text2Style: { fontSize: 16 },
       });
       return;
     }
@@ -186,7 +190,9 @@ Relato: ${complaintDetails}
       Toast.show({
         type: 'success',
         text1: 'Sucesso',
+        text1Style: { fontSize: 18 },
         text2: `Protocolo ${protocol} criado com sucesso`,
+        text2Style: { fontSize: 16 },
       });
 
       // Reset form
@@ -208,6 +214,55 @@ Relato: ${complaintDetails}
   const closeModal = () => {
     setIsModalVisible(false);
     setRecommendations('');
+  };
+
+  const handleSearchProtocol = async () => {
+    if (!searchProtocol.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text1Style: { fontSize: 18 },
+        text2: 'Digite o número do protocolo.',
+        text2Style: { fontSize: 16 },
+      });
+      return;
+    }
+    setIsSearching(true);
+
+    try {
+      const existingProtocols = await AsyncStorage.getItem('protocols');
+      const protocols = existingProtocols ? JSON.parse(existingProtocols) : [];
+      const foundProtocol = protocols.find((p: any) => p.id === searchProtocol.trim());
+
+      if (foundProtocol) {
+        Toast.show({
+          type: 'success',
+          text1: 'Protocolo encontrado',
+          text1Style: { fontSize: 18 },
+          text2: `Protocolo ${foundProtocol.id} - Status: ${foundProtocol.status}`,
+          text2Style: { fontSize: 16 },
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Protocolo não encontrado',
+          text1Style: { fontSize: 18 },
+          text2: 'Verifique o número digitado.',
+          text2Style: { fontSize: 16 },
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao buscar protocolo:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text1Style: { fontSize: 18 },
+        text2: 'Falha ao consultar protocolo.',
+        text2Style: { fontSize: 16 },
+      });
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   return (
@@ -306,6 +361,30 @@ Relato: ${complaintDetails}
                 </View>
               )}
             </View>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+            <Text style={[styles.sectionTitle, { color: primaryColor }]}>
+              Consultar Protocolo
+            </Text>
+            <TextInput
+              style={styles.textArea}
+              placeholder="Digite o número do protocolo"
+              value={searchProtocol}
+              onChangeText={setSearchProtocol}
+              keyboardType="numeric"
+            />
+            <TouchableOpacity
+              style={[styles.submitButton, { backgroundColor: primaryColor, marginTop: 10 }]}
+              onPress={handleSearchProtocol}
+              disabled={isSearching}
+            >
+              {isSearching ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.submitText}>Consultar Protocolo</Text>
+              )}
+            </TouchableOpacity>
           </View>
         </ScrollView>
 
