@@ -15,7 +15,7 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
 import * as ImagePicker from 'expo-image-picker';
 import { getInfoAsync, readAsStringAsync } from 'expo-file-system/legacy';
-import { send } from '@emailjs/react-native';
+
 import ModalComponent from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -50,6 +50,8 @@ const DenunciaScreen = (props: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [recommendations, setRecommendations] = useState('');
+  const [protocolNumber, setProtocolNumber] = useState('');
+  const [protocolData, setProtocolData] = useState<any>(null);
 
   const radioButtons = abuseTypes.map((type) => ({
     id: type.id,
@@ -67,7 +69,7 @@ const DenunciaScreen = (props: Props) => {
       mediaTypes: ['images', 'videos'],
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.7, // Reduz qualidade para comprimir
     });
     if (!result.canceled) {
       setMediaUri(result.assets[0].uri);
@@ -121,6 +123,30 @@ const DenunciaScreen = (props: Props) => {
     setMediaType(null);
   };
 
+  const handleSearchProtocol = async () => {
+    if (!protocolNumber.trim()) {
+      Alert.alert('Erro', 'Por favor, insira o número do protocolo.');
+      return;
+    }
+
+    try {
+      const existingProtocols = await AsyncStorage.getItem('protocols');
+      const protocols = existingProtocols ? JSON.parse(existingProtocols) : [];
+
+      const foundProtocol = protocols.find((p: any) => p.id === protocolNumber.trim());
+
+      if (foundProtocol) {
+        setProtocolData(foundProtocol);
+      } else {
+        Alert.alert('Protocolo não encontrado', 'Verifique o número do protocolo e tente novamente.');
+        setProtocolData(null);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar protocolo:', error);
+      Alert.alert('Erro', 'Falha ao buscar o protocolo. Tente novamente.');
+    }
+  };
+
   const handleSubmit = async () => {
     if (!abuseType || !complaintDetails) {
       Toast.show({
@@ -151,22 +177,33 @@ Relato: ${complaintDetails}
         }
       }
 
-      const templateParams = {
-        to_email: 'informatica@camaracanelinha.sc.gov.br',
-        subject: 'Denúncia - Procuradoria da Mulher',
-        message: emailBody,
-        attachment: attachmentBase64 ? `data:${mediaType === 'image' ? 'image/jpeg' : mediaType === 'video' ? 'video/mp4' : 'audio/mpeg'};base64,${attachmentBase64}` : null,
-      };
+      const formData = new FormData();
+      formData.append('subject', 'Denúncia - Procuradoria da Mulher');
+      formData.append('message', emailBody);
 
-      // Note: Replace with your actual EmailJS service ID, template ID, and public key
-      await send(
-        'service_fupehjx',
-        'template_xlepue8',
-        templateParams,
-        {
-          publicKey: '2IWzzSj591-UZ11lD'
-        }
-      );
+      if (mediaUri) {
+        const fileName = `attachment.${mediaType === 'image' ? 'jpg' : mediaType === 'video' ? 'mp4' : 'mp3'}`;
+        formData.append('attachment', {
+          uri: mediaUri,
+          name: fileName,
+          type: mediaType === 'image' ? 'image/jpeg' : mediaType === 'video' ? 'video/mp4' : 'audio/mpeg',
+        } as any);
+      }
+
+      const response = await fetch('https://email-service-eta-two.vercel.app/api/send-email', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Erro HTTP ${response.status}: ${text}`);
+      }
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao enviar email');
+      }
 
       // Save protocol to local storage
       const protocolData = {
@@ -306,6 +343,53 @@ Relato: ${complaintDetails}
                 </View>
               )}
             </View>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+            <Text style={[styles.sectionTitle, { color: primaryColor }]}>
+              Consultar Protocolo
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite o número do protocolo"
+              value={protocolNumber}
+              onChangeText={setProtocolNumber}
+              keyboardType="numeric"
+            />
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: primaryColor }]}
+              onPress={handleSearchProtocol}
+            >
+              <Text style={[styles.buttonText, { color: 'white' }]}>Buscar</Text>
+            </TouchableOpacity>
+            {protocolData && (
+              <View style={styles.protocolDetails}>
+                <Text style={[styles.detailText, { color: textColor }]}>
+                  <Text style={styles.detailLabel}>Número do Protocolo: </Text>
+                  {protocolData.id}
+                </Text>
+                <Text style={[styles.detailText, { color: textColor }]}>
+                  <Text style={styles.detailLabel}>Tipo de Violência: </Text>
+                  {protocolData.abuseType}
+                </Text>
+                <Text style={[styles.detailText, { color: textColor }]}>
+                  <Text style={styles.detailLabel}>Relato: </Text>
+                  {protocolData.complaintDetails}
+                </Text>
+                <Text style={[styles.detailText, { color: textColor }]}>
+                  <Text style={styles.detailLabel}>Mídia: </Text>
+                  {protocolData.mediaType ? protocolData.mediaType : 'Nenhuma'}
+                </Text>
+                <Text style={[styles.detailText, { color: textColor }]}>
+                  <Text style={styles.detailLabel}>Data: </Text>
+                  {new Date(protocolData.date).toLocaleString()}
+                </Text>
+                <Text style={[styles.detailText, { color: textColor }]}>
+                  <Text style={styles.detailLabel}>Status: </Text>
+                  {protocolData.status}
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
 
@@ -530,6 +614,25 @@ const styles = StyleSheet.create({
   radioLabel: {
     fontSize: 16,
     color: '#333333',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  protocolDetails: {
+    marginTop: 20,
+  },
+  detailText: {
+    fontSize: 16,
+    marginBottom: 8,
+    color: '#333333',
+  },
+  detailLabel: {
+    fontWeight: 'bold',
   },
 });
 
