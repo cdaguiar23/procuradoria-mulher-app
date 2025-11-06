@@ -15,60 +15,59 @@ const SobreScreen = ({ navigation }: Props) => {
 
   return (
     <View style={[styles.container, { backgroundColor: backgroundColor }]}>
-      <View style={styles.header}>
-        <Image source={require('../../assets/logo_procuradoria.png')} style={styles.logo} />
+      <View style={styles.contentContainer}>
         <Text style={[styles.title, { color: primaryColor }]}>
-          Procuradoria Especial da Mulher de Canelinha
+          Sobre
         </Text>
         <Text style={[styles.subtitle, { color: lightTextColor }]}>
-          Um espaço seguro de apoio, informação e proteção para todas as mulheres de Canelinha. Estamos aqui para ajudar.
+          Conheça a equipe e informações de contato da Procuradoria Especial da Mulher de Canelinha.
         </Text>
+
+        <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
+          <View style={[styles.section, { backgroundColor: cardBackgroundColor }]}>
+            <Text style={[styles.sectionTitle, { color: primaryColor }]}>Equipe</Text>
+            <View style={styles.teamContainer}>
+              <View style={styles.teamMember}>
+                <Image source={require('../../assets/vereadora_janaira.jpg')} style={styles.teamPhoto} />
+                <Text style={[styles.teamName, { color: textColor }]}>Janaira Reis</Text>
+                <Text style={[styles.teamRole, { color: lightTextColor }]}>Presidente</Text>
+              </View>
+              <View style={styles.teamMember}>
+                <Image source={require('../../assets/vereadora_fabricia.jpg')} style={styles.teamPhoto} />
+                <Text style={[styles.teamName, { color: textColor }]}>Fabrícia Betinelli</Text>
+                <Text style={[styles.teamRole, { color: lightTextColor }]}>Vice-Presidente</Text>
+              </View>
+              <View style={styles.teamMember}>
+                <Image source={require('../../assets/vereador_jackson.jpg')} style={styles.teamPhoto} />
+                <Text style={[styles.teamName, { color: textColor }]}>Jackson Miguel Machado</Text>
+                <Text style={[styles.teamRole, { color: lightTextColor }]}>Membro</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={[styles.section, { backgroundColor: cardBackgroundColor }]}>
+            <Text style={[styles.sectionTitle, { color: primaryColor }]}>Contato e Localização</Text>
+            <View style={styles.contactItem}>
+              <MapPin color={primaryColor} size={24} />
+              <Text style={[styles.contactText, { color: textColor }]}>
+                Rua Manoel Francisco Correa, 417 CEP: 88230-000 Centro Canelinha/SC
+              </Text>
+            </View>
+            <View style={styles.contactItem}>
+              <Phone color={primaryColor} size={24} />
+              <Text style={[styles.contactText, { color: textColor }]}>
+                (48) 3264-0033
+              </Text>
+            </View>
+            <View style={styles.contactItem}>
+              <Mail color={primaryColor} size={24} />
+              <Text style={[styles.contactText, { color: textColor }]}>
+                procuradoriadamulher@camaracanelinha.sc.gov.br
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
       </View>
-
-      <ScrollView style={styles.scrollView}>
-        <View style={[styles.section, { backgroundColor: cardBackgroundColor }]}>
-          <Text style={[styles.sectionTitle, { color: primaryColor }]}>Equipe</Text>
-          <View style={styles.teamContainer}>
-            <View style={styles.teamMember}>
-              <Image source={require('../../assets/vereadora_janaira.jpg')} style={styles.teamPhoto} />
-              <Text style={[styles.teamName, { color: textColor }]}>Janaira Reis</Text>
-              <Text style={[styles.teamRole, { color: lightTextColor }]}>Presidente</Text>
-            </View>
-            <View style={styles.teamMember}>
-              <Image source={require('../../assets/vereadora_fabricia.jpg')} style={styles.teamPhoto} />
-              <Text style={[styles.teamName, { color: textColor }]}>Fabrícia Betinelli</Text>
-              <Text style={[styles.teamRole, { color: lightTextColor }]}>Vice-Presidente</Text>
-            </View>
-            <View style={styles.teamMember}>
-              <Image source={require('../../assets/vereador_jackson.jpg')} style={styles.teamPhoto} />
-              <Text style={[styles.teamName, { color: textColor }]}>Jackson Miguel Machado</Text>
-              <Text style={[styles.teamRole, { color: lightTextColor }]}>Membro</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={[styles.section, { backgroundColor: cardBackgroundColor }]}>
-          <Text style={[styles.sectionTitle, { color: primaryColor }]}>Contato e Localização</Text>
-          <View style={styles.contactItem}>
-            <MapPin color={primaryColor} size={24} />
-            <Text style={[styles.contactText, { color: textColor }]}>
-              Rua Manoel Francisco Correa, 417 CEP: 88230-000 Centro Canelinha/SC
-            </Text>
-          </View>
-          <View style={styles.contactItem}>
-            <Phone color={primaryColor} size={24} />
-            <Text style={[styles.contactText, { color: textColor }]}>
-              (48) 3264-0033
-            </Text>
-          </View>
-          <View style={styles.contactItem}>
-            <Mail color={primaryColor} size={24} />
-            <Text style={[styles.contactText, { color: textColor }]}>
-              procuradoriadamulher@camaracanelinha.sc.gov.br
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
     </View>
   );
 };
@@ -78,33 +77,34 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 50,
   },
-  header: {
-    padding: 20,
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  logo: {
-    width: 200,
-    height: 100,
-    marginBottom: 10,
-    resizeMode: 'contain',
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
+    lineHeight: 36,
   },
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 32,
+    lineHeight: 24,
+    paddingHorizontal: 16,
   },
-  scrollView: {
+  scrollContainer: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: 100,
+  },
   section: {
-    margin: 20,
+    marginHorizontal: 10,
+    marginVertical: 10,
     padding: 20,
     borderRadius: 12,
     shadowColor: '#000',
