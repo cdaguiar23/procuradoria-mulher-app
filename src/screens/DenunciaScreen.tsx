@@ -15,6 +15,8 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
 import * as ImagePicker from 'expo-image-picker';
 import { getInfoAsync, readAsStringAsync } from 'expo-file-system/legacy';
+import VideoCompressor from 'react-native-video-compressor';
+import { Audio } from 'expo-av';
 
 import ModalComponent from 'react-native-modal';
 import Toast from 'react-native-toast-message';
@@ -52,12 +54,71 @@ const DenunciaScreen = (props: Props) => {
   const [recommendations, setRecommendations] = useState('');
   const [protocolNumber, setProtocolNumber] = useState('');
   const [protocolData, setProtocolData] = useState<any>(null);
+  const [isCompressing, setIsCompressing] = useState(false);
 
   const radioButtons = abuseTypes.map((type) => ({
     id: type.id,
     label: type.label,
     value: type.id,
   }));
+
+  const compressVideo = async (uri: string) => {
+    try {
+      setIsCompressing(true);
+      if (VideoCompressor && VideoCompressor.compress) {
+        // Primeiro, verificar tamanho original
+        const originalInfo = await getInfoAsync(uri);
+        console.log('Tamanho original do vídeo:', (originalInfo as any).size || 'desconhecido');
+
+        // Tentar compressão automática primeiro
+        let compressedUri = await VideoCompressor.compress(uri, {
+          compressionMethod: 'auto',
+        });
+
+        // Verificar tamanho após compressão
+        const compressedInfo = await getInfoAsync(compressedUri);
+        console.log('Tamanho após compressão automática:', (compressedInfo as any).size);
+
+        // Se ainda for maior que 4MB, tentar compressão mais agressiva
+        const MAX_SIZE = 4 * 1024 * 1024; // 4MB
+        if ((compressedInfo as any).size > MAX_SIZE) {
+          console.log('Vídeo ainda muito grande, tentando compressão mais agressiva...');
+          compressedUri = await VideoCompressor.compress(uri, {
+            compressionMethod: 'manual',
+            options: {
+              width: 640,
+              height: 480,
+              bitrate: 1000000, // 1Mbps
+              fps: 24,
+            },
+          });
+
+          const finalInfo = await getInfoAsync(compressedUri);
+          console.log('Tamanho após compressão agressiva:', (finalInfo as any).size);
+
+          if ((finalInfo as any).size > MAX_SIZE) {
+            Alert.alert(
+              'Vídeo muito grande',
+              'O vídeo é muito grande mesmo após compressão. Tente um vídeo mais curto ou de menor qualidade.',
+              [{ text: 'OK', onPress: () => clearMedia() }]
+            );
+            return null;
+          }
+        }
+
+        return compressedUri;
+      } else {
+        console.warn('VideoCompressor não disponível. Usando vídeo original.');
+        return uri;
+      }
+    } catch (error) {
+      console.error('Erro ao comprimir vídeo:', error);
+      Alert.alert('Erro', 'Falha ao comprimir vídeo. Usando vídeo original.');
+      return uri;
+    } finally {
+      setIsCompressing(false);
+    }
+  };
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -69,12 +130,18 @@ const DenunciaScreen = (props: Props) => {
       mediaTypes: ['images', 'videos'],
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.7, // Reduz qualidade para comprimir
+      quality: 0.5, // Reduz qualidade para comprimir
     });
     if (!result.canceled) {
-      setMediaUri(result.assets[0].uri);
-      if (result.assets[0].type === 'image') setMediaType('image');
-      else if (result.assets[0].type === 'video') setMediaType('video');
+      const uri = result.assets[0].uri;
+      if (result.assets[0].type === 'image') {
+        setMediaUri(uri);
+        setMediaType('image');
+      } else if (result.assets[0].type === 'video') {
+        const compressedUri = await compressVideo(uri);
+        setMediaUri(compressedUri);
+        setMediaType('video');
+      }
     }
   };
 
@@ -108,14 +175,51 @@ const DenunciaScreen = (props: Props) => {
       quality: 1,
     });
     if (!result.canceled) {
-      setMediaUri(result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      const compressedUri = await compressVideo(uri);
+      setMediaUri(compressedUri);
       setMediaType('video');
     }
   };
 
-  // Note: Audio recording is more complex in RN, simplified for now
-  const recordAudio = () => {
-    Alert.alert('Funcionalidade', 'Gravação de áudio não implementada ainda.');
+  const recordAudio = async () => {
+    try {
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissão necessária', 'Precisamos de permissão para acessar o microfone.');
+        return;
+      }
+
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
+      await recording.startAsync();
+
+      Alert.alert(
+        'Gravando',
+        'Toque em OK para parar a gravação.',
+        [
+          {
+            text: 'OK',
+            onPress: async () => {
+              try {
+                await recording.stopAndUnloadAsync();
+                const uri = recording.getURI();
+                if (uri) {
+                  setMediaUri(uri);
+                  setMediaType('audio');
+                }
+              } catch (error) {
+                console.error('Erro ao parar gravação:', error);
+                Alert.alert('Erro', 'Falha ao salvar a gravação.');
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error('Erro ao gravar áudio:', error);
+      Alert.alert('Erro', 'Falha ao iniciar gravação de áudio.');
+    }
   };
 
   const clearMedia = () => {
@@ -171,6 +275,16 @@ Relato: ${complaintDetails}
       if (mediaUri && Platform.OS !== 'web') {
         const fileInfo = await getInfoAsync(mediaUri);
         if (fileInfo.exists) {
+          // Check final file size before sending
+          const MAX_UPLOAD_SIZE = 4 * 1024 * 1024; // 4MB
+          if ((fileInfo as any).size > MAX_UPLOAD_SIZE) {
+            Alert.alert(
+              'Arquivo muito grande',
+              'O arquivo anexado é muito grande para envio. Tente um arquivo menor.',
+              [{ text: 'OK', onPress: () => clearMedia() }]
+            );
+            return;
+          }
           attachmentBase64 = await readAsStringAsync(mediaUri, {
             encoding: 'base64',
           });
@@ -334,12 +448,21 @@ Relato: ${complaintDetails}
                 </View>
               ) : (
                 <View style={styles.mediaPreview}>
-                  {mediaType === 'image' && <Image source={{ uri: mediaUri }} style={styles.image} />}
-                  {mediaType === 'video' && <Text style={[styles.mediaText, { color: lightTextColor }]}>Vídeo anexado</Text>}
-                  {mediaType === 'audio' && <Text style={[styles.mediaText, { color: lightTextColor }]}>Áudio anexado</Text>}
-                  <TouchableOpacity style={styles.clearButton} onPress={clearMedia}>
-                    <Trash2 size={20} color="red" />
-                  </TouchableOpacity>
+                  {isCompressing ? (
+                    <View style={styles.compressingContainer}>
+                      <ActivityIndicator size="large" color={primaryColor} />
+                      <Text style={[styles.compressingText, { color: lightTextColor }]}>Comprimindo vídeo...</Text>
+                    </View>
+                  ) : (
+                    <>
+                      {mediaType === 'image' && <Image source={{ uri: mediaUri }} style={styles.image} />}
+                      {mediaType === 'video' && <Text style={[styles.mediaText, { color: lightTextColor }]}>Vídeo anexado</Text>}
+                      {mediaType === 'audio' && <Text style={[styles.mediaText, { color: lightTextColor }]}>Áudio anexado</Text>}
+                      <TouchableOpacity style={styles.clearButton} onPress={clearMedia}>
+                        <Trash2 size={20} color="red" />
+                      </TouchableOpacity>
+                    </>
+                  )}
                 </View>
               )}
             </View>
@@ -530,6 +653,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 15,
     padding: 5,
+  },
+  compressingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  compressingText: {
+    fontSize: 16,
+    marginTop: 10,
   },
   buttonContainer: {
     alignItems: 'center',
