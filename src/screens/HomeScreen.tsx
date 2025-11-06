@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 
-import { Shield, Users, BookOpen, FileText } from 'lucide-react-native';
+import { Shield, Users, BookOpen, FileText, Info } from 'lucide-react-native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
 
@@ -72,6 +72,17 @@ const HomeScreen = ({ navigation }: Props) => {
         </Text>
         <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('B.O.')}>
           <Text style={[styles.cardButtonText, { color: primaryColor }]}>Registrar B.O.</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+        <Info color={primaryColor} size={40} />
+        <Text style={[styles.cardTitle, { color: primaryColor }]}>Sobre</Text>
+        <Text style={[styles.cardDescription, { color: lightTextColor }]}>
+          Conheça a equipe e informações de contato da Procuradoria.
+        </Text>
+        <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Sobre')}>
+          <Text style={[styles.cardButtonText, { color: primaryColor }]}>Ver Sobre</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

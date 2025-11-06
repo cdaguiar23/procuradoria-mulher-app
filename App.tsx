@@ -1,13 +1,14 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Home, Shield, Users, BookOpen, FileText } from 'lucide-react-native';
+import { Home, Shield, Users, BookOpen, FileText, Info } from 'lucide-react-native';
 
 import HomeScreen from './src/screens/HomeScreen';
 import DenunciaScreen from './src/screens/DenunciaScreen';
 import RedeScreen from './src/screens/RedeScreen';
 import DireitosScreen from './src/screens/DireitosScreen';
 import BOScreen from './src/screens/BOScreen';
+import SobreScreen from './src/screens/SobreScreen';
 
 export type RootTabParamList = {
   Início: undefined;
@@ -15,6 +16,7 @@ export type RootTabParamList = {
   Rede: undefined;
   Direitos: undefined;
   'B.O.': undefined;
+  Sobre: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -86,6 +88,15 @@ const App = () => {
           options={{
             tabBarIcon: ({ color, size }) => (
               <FileText color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Sobre"
+          component={SobreScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Info color={color} size={size} />
             ),
           }}
         />
