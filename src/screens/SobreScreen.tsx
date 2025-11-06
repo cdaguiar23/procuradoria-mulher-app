@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Linking, TouchableOpacity } from 'react-native';
 import { Info, MapPin, Phone, Mail } from 'lucide-react-native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../../App';
@@ -47,24 +47,62 @@ const SobreScreen = ({ navigation }: Props) => {
 
           <View style={[styles.section, { backgroundColor: cardBackgroundColor }]}>
             <Text style={[styles.sectionTitle, { color: primaryColor }]}>Contato e Localização</Text>
-            <View style={styles.contactItem}>
+            <Text style={[styles.sectionDescription, { color: lightTextColor }]}>
+              Clique nos itens abaixo para abrir os aplicativos correspondentes (mapas, telefone ou email).
+            </Text>
+            <TouchableOpacity
+              style={styles.contactItem}
+              onPress={async () => {
+                const url = 'https://www.google.com/maps/search/?api=1&query=Rua+Manoel+Francisco+Correa+417+Canelinha+SC';
+                try {
+                  const supported = await Linking.canOpenURL(url);
+                  if (supported) {
+                    await Linking.openURL(url);
+                  } else {
+                    console.log("Don't know how to open URI: " + url);
+                  }
+                } catch (error) {
+                  console.error('Error opening URL:', error);
+                }
+              }}
+            >
               <MapPin color={primaryColor} size={24} />
               <Text style={[styles.contactText, { color: textColor }]}>
                 Rua Manoel Francisco Correa, 417 CEP: 88230-000 Centro Canelinha/SC
               </Text>
-            </View>
-            <View style={styles.contactItem}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.contactItem}
+              onPress={() => {
+                Linking.openURL('tel:+554832640033');
+              }}
+            >
               <Phone color={primaryColor} size={24} />
               <Text style={[styles.contactText, { color: textColor }]}>
                 (48) 3264-0033
               </Text>
-            </View>
-            <View style={styles.contactItem}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.contactItem}
+              onPress={async () => {
+                const url = 'mailto:procuradoriadamulher@camaracanelinha.sc.gov.br';
+                try {
+                  const supported = await Linking.canOpenURL(url);
+                  if (supported) {
+                    await Linking.openURL(url);
+                  } else {
+                    console.log("Don't know how to open URI: " + url);
+                  }
+                } catch (error) {
+                  console.error('Error opening URL:', error);
+                }
+              }}
+            >
               <Mail color={primaryColor} size={24} />
               <Text style={[styles.contactText, { color: textColor }]}>
                 procuradoriadamulher@camaracanelinha.sc.gov.br
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
@@ -116,8 +154,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 10,
     textAlign: 'center',
+  },
+  sectionDescription: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
   },
   teamContainer: {
     flexDirection: 'column',
