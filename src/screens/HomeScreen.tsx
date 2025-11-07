@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking } from 'react-native';
 
 import { Shield, Users, BookOpen, FileText, Info } from 'lucide-react-native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -16,8 +16,7 @@ const HomeScreen = ({ navigation }: Props) => {
   const lightTextColor = '#555555';
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: backgroundColor }]}>
-
+    <View style={[styles.container, { backgroundColor: backgroundColor }]}>
       <View style={styles.header}>
         <Image source={require('../../assets/logo_procuradoria.png')} style={styles.logo} />
         <Text style={[styles.title, { color: primaryColor }]}>
@@ -26,66 +25,70 @@ const HomeScreen = ({ navigation }: Props) => {
         <Text style={[styles.subtitle, { color: lightTextColor }]}>
           Um espaço seguro de apoio, informação e proteção para todas as mulheres de Canelinha. Estamos aqui para ajudar.
         </Text>
-        <TouchableOpacity style={[styles.button, { backgroundColor: primaryColor }]} onPress={() => navigation.navigate('Denúncia')}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: primaryColor }]} onPress={() => {
+          Linking.openURL('tel:+554832640033');
+        }}>
           <Text style={styles.buttonText}>Precisa de Ajuda? Fale Conosco</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
-        <Shield color={primaryColor} size={40} />
-        <Text style={[styles.cardTitle, { color: primaryColor }]}>Denúncia Anônima</Text>
-        <Text style={[styles.cardDescription, { color: lightTextColor }]}>
-          Faça uma denúncia de forma segura e anônima. Sua identidade será protegida.
-        </Text>
-        <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Denúncia')}>
-          <Text style={[styles.cardButtonText, { color: primaryColor }]}>Fazer Denúncia</Text>
-        </TouchableOpacity>
-      </View>
+      <ScrollView style={styles.scrollView}>
+        <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+          <Shield color={primaryColor} size={40} />
+          <Text style={[styles.cardTitle, { color: primaryColor }]}>Denúncia Anônima</Text>
+          <Text style={[styles.cardDescription, { color: lightTextColor }]}>
+            Faça uma denúncia de forma segura e anônima. Sua identidade será protegida.
+          </Text>
+          <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Denúncia')}>
+            <Text style={[styles.cardButtonText, { color: primaryColor }]}>Fazer Denúncia</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
-        <Users color={primaryColor} size={40} />
-        <Text style={[styles.cardTitle, { color: primaryColor }]}>Rede de Apoio</Text>
-        <Text style={[styles.cardDescription, { color: lightTextColor }]}>
-          Conecte-se com serviços de apoio e organizações que ajudam mulheres em situação de vulnerabilidade.
-        </Text>
-        <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Rede')}>
-          <Text style={[styles.cardButtonText, { color: primaryColor }]}>Acessar Rede</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+          <Users color={primaryColor} size={40} />
+          <Text style={[styles.cardTitle, { color: primaryColor }]}>Rede de Apoio</Text>
+          <Text style={[styles.cardDescription, { color: lightTextColor }]}>
+            Conecte-se com serviços de apoio e organizações que ajudam mulheres em situação de vulnerabilidade.
+          </Text>
+          <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Rede')}>
+            <Text style={[styles.cardButtonText, { color: primaryColor }]}>Acessar Rede</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
-        <BookOpen color={primaryColor} size={40} />
-        <Text style={[styles.cardTitle, { color: primaryColor }]}>Direitos da Mulher</Text>
-        <Text style={[styles.cardDescription, { color: lightTextColor }]}>
-          Informações sobre os direitos das mulheres e como exercê-los.
-        </Text>
-        <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Direitos')}>
-          <Text style={[styles.cardButtonText, { color: primaryColor }]}>Ver Direitos</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+          <BookOpen color={primaryColor} size={40} />
+          <Text style={[styles.cardTitle, { color: primaryColor }]}>Direitos da Mulher</Text>
+          <Text style={[styles.cardDescription, { color: lightTextColor }]}>
+            Informações sobre os direitos das mulheres e como exercê-los.
+          </Text>
+          <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Direitos')}>
+            <Text style={[styles.cardButtonText, { color: primaryColor }]}>Ver Direitos</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
-        <FileText color={primaryColor} size={40} />
-        <Text style={[styles.cardTitle, { color: primaryColor }]}>B.O.</Text>
-        <Text style={[styles.cardDescription, { color: lightTextColor }]}>
-          Saiba como registrar um Boletim de Ocorrência de forma segura.
-        </Text>
-        <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('B.O.')}>
-          <Text style={[styles.cardButtonText, { color: primaryColor }]}>Registrar B.O.</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+          <FileText color={primaryColor} size={40} />
+          <Text style={[styles.cardTitle, { color: primaryColor }]}>B.O.</Text>
+          <Text style={[styles.cardDescription, { color: lightTextColor }]}>
+            Saiba como registrar um Boletim de Ocorrência de forma segura.
+          </Text>
+          <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('B.O.')}>
+            <Text style={[styles.cardButtonText, { color: primaryColor }]}>Registrar B.O.</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
-        <Info color={primaryColor} size={40} />
-        <Text style={[styles.cardTitle, { color: primaryColor }]}>Sobre</Text>
-        <Text style={[styles.cardDescription, { color: lightTextColor }]}>
-          Conheça a equipe e informações de contato da Procuradoria.
-        </Text>
-        <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Sobre')}>
-          <Text style={[styles.cardButtonText, { color: primaryColor }]}>Ver Sobre</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+          <Info color={primaryColor} size={40} />
+          <Text style={[styles.cardTitle, { color: primaryColor }]}>Sobre</Text>
+          <Text style={[styles.cardDescription, { color: lightTextColor }]}>
+            Conheça a equipe e informações de contato da Procuradoria.
+          </Text>
+          <TouchableOpacity style={[styles.cardButton, { borderColor: primaryColor }]} onPress={() => navigation.navigate('Sobre')}>
+            <Text style={[styles.cardButtonText, { color: primaryColor }]}>Ver Sobre</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -96,26 +99,30 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    padding: 20,
+    padding: 15,
     alignItems: 'center',
     textAlign: 'center',
   },
+
+  scrollView: {
+    flex: 1,
+  },
   logo: {
-    width: 200,
-    height: 100,
-    marginBottom: 10,
+    width: 180,
+    height: 90,
+    marginBottom: 8,
     resizeMode: 'contain',
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
   },
 
   button: {
