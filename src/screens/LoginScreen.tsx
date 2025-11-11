@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackScreenProps } from '@react-navigation/stack';
 
 type RootStackParamList = {
   Login: undefined;
+  Register: undefined;
   Main: undefined;
 };
 
@@ -19,12 +21,26 @@ const LoginScreen = ({ navigation }: Props) => {
   const textColor = '#333333';
   const lightTextColor = '#555555';
 
-  const handleLogin = () => {
-    // Simple validation - in a real app, this would authenticate with a server
-    if (login.trim() && senha.trim()) {
-      navigation.replace('Main');
-    } else {
+  const handleLogin = async () => {
+    if (!login.trim() || !senha.trim()) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return;
+    }
+
+    try {
+      const userDataString = await AsyncStorage.getItem('userData');
+      if (userDataString) {
+        const userData = JSON.parse(userDataString);
+        if (userData.email === login.trim() && userData.senha === senha) {
+          navigation.replace('Main');
+        } else {
+          Alert.alert('Erro', 'Credenciais inválidas.');
+        }
+      } else {
+        Alert.alert('Erro', 'Nenhum usuário cadastrado. Faça o cadastro primeiro.');
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Falha ao verificar as credenciais.');
     }
   };
 
@@ -58,6 +74,9 @@ const LoginScreen = ({ navigation }: Props) => {
         />
         <TouchableOpacity style={[styles.button, { backgroundColor: primaryColor }]} onPress={handleLogin}>
           <Text style={styles.buttonText}>Acessar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}>
+          <Text style={[styles.registerButtonText, { color: primaryColor }]}>Não tem cadastro? Cadastre-se</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -117,6 +136,15 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  registerButton: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    marginTop: 10,
+  },
+  registerButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
   },
