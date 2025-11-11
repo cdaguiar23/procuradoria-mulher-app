@@ -58,13 +58,13 @@ const RedeScreen = (props: Props) => {
             </Text>
             <TouchableOpacity
               style={styles.phoneButton}
-              onPress={() => handlePhonePress('4834330000')}
+              onPress={() => handlePhonePress('4832640033')}
             >
               <Phone size={20} color={primaryColor} />
-              <Text style={[styles.phoneText, { color: primaryColor }]}>(48) 3433-0000</Text>
+              <Text style={[styles.phoneText, { color: primaryColor }]}>(48) 3264-0033</Text>
             </TouchableOpacity>
             <Text style={[styles.address, { color: lightTextColor }]}>
-              Rua Manoel José Pedroso, 200 - Centro, Canelinha/SC
+              Rua Francisco Manoel Correa, 417 - Centro, Canelinha/SC
             </Text>
           </View>
 
@@ -78,43 +78,36 @@ const RedeScreen = (props: Props) => {
             </Text>
             <TouchableOpacity
               style={styles.phoneButton}
-              onPress={() => handlePhonePress('4834330000')}
+              onPress={() => handlePhonePress('4832640190')}
             >
               <Phone size={20} color={primaryColor} />
-              <Text style={[styles.phoneText, { color: primaryColor }]}>(48) 3433-0000</Text>
+              <Text style={[styles.phoneText, { color: primaryColor }]}>(48) 3264-0190</Text>
             </TouchableOpacity>
-          </View>
-
-          {/* Serviços Oferecidos Card */}
-          <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
-            <Text style={[styles.sectionTitle, { color: primaryColor }]}>
-              Serviços Oferecidos
+            <Text style={[styles.address, { color: lightTextColor }]}>
+              Rua Dona Avelina Bastos – Centro, Canelinha – SC – CEP: 88230-000
             </Text>
-            <View style={styles.bulletList}>
-              <Text style={[styles.bulletItem, { color: lightTextColor }]}>• Acolhimento</Text>
-              <Text style={[styles.bulletItem, { color: lightTextColor }]}>• Apoio psicológico</Text>
-              <Text style={[styles.bulletItem, { color: lightTextColor }]}>• Apoio jurídico</Text>
-              <Text style={[styles.bulletItem, { color: lightTextColor }]}>• Apoio local</Text>
-            </View>
+            <Text style={[styles.address, { color: lightTextColor }]}>
+              e-mail: dpcanelinha@pc.sc.gov.br
+            </Text>
           </View>
 
           {/* Centro de Referência Card */}
           <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
             <Text style={[styles.sectionTitle, { color: primaryColor }]}>
-              Centro de Referência
+              Centro de Referência de Assistência Social (Cras)
             </Text>
             <Text style={[styles.description, { color: lightTextColor }]}>
               Centro de Referência da Mulher em Canelinha.
             </Text>
             <TouchableOpacity
               style={styles.phoneButton}
-              onPress={() => handlePhonePress('4834330000')}
+              onPress={() => handlePhonePress('4832640133')}
             >
               <Phone size={20} color={primaryColor} />
-              <Text style={[styles.phoneText, { color: primaryColor }]}>(48) 3433-0000</Text>
+              <Text style={[styles.phoneText, { color: primaryColor }]}>(48) 3264-0133</Text>
             </TouchableOpacity>
             <Text style={[styles.address, { color: lightTextColor }]}>
-              Rua Manoel Francisco Pereira, 417 - Centro, Canelinha/SC
+              Av. Prefeito Silvestre Nunes, 951, Canelinha – SC
             </Text>
           </View>
         </ScrollView>
