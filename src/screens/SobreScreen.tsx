@@ -17,7 +17,7 @@ const SobreScreen = ({ navigation }: Props) => {
     <View style={[styles.container, { backgroundColor: backgroundColor }]}>
       <View style={styles.contentContainer}>
         <Text style={[styles.title, { color: primaryColor }]}>
-          Sobre
+          Sobre a Procuradoria
         </Text>
         <Text style={[styles.subtitle, { color: lightTextColor }]}>
           Conheça a equipe e informações de contato da Procuradoria Especial da Mulher de Canelinha.
