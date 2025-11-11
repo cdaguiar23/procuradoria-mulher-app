@@ -68,7 +68,7 @@ const HomeScreen = ({ navigation }: Props) => {
 
         <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
           <FileText color={primaryColor} size={40} />
-          <Text style={[styles.cardTitle, { color: primaryColor }]}>B.O.</Text>
+          <Text style={[styles.cardTitle, { color: primaryColor }]}>Boletim de Ocorrência</Text>
           <Text style={[styles.cardDescription, { color: lightTextColor }]}>
             Saiba como registrar um Boletim de Ocorrência de forma segura.
           </Text>
@@ -79,7 +79,7 @@ const HomeScreen = ({ navigation }: Props) => {
 
         <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
           <Info color={primaryColor} size={40} />
-          <Text style={[styles.cardTitle, { color: primaryColor }]}>Sobre</Text>
+          <Text style={[styles.cardTitle, { color: primaryColor }]}>Sobre a Procuradoria</Text>
           <Text style={[styles.cardDescription, { color: lightTextColor }]}>
             Conheça a equipe e informações de contato da Procuradoria.
           </Text>
