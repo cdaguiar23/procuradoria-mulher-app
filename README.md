@@ -130,9 +130,6 @@ npx eas build --platform ios
 
 Certifique-se de configurar o arquivo `eas.json` com as credenciais apropriadas.
 
-## 📋 Requisitos Funcionais e Não Funcionais
-
-Consulte o documento `REQUSITOS FUNCIONAIS E NÃO FUNCIONAIS.docx` para detalhes completos sobre os requisitos do sistema.
 
 ---
 
