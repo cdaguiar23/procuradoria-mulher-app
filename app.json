@@ -1,27 +1,37 @@
 {
   "expo": {
-    "name": "procuradoria-mulher-app",
+    "name": "Procuradoria Mulher Canelinha",
     "slug": "procuradoria-mulher-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo_procuradoria.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/logo_procuradoria.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cdaguiar23.procuradoriamulherapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/logo_procuradoria.png",
+        "backgroundColor": "#8B1B42"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.INTERNET"
+      ],
+      "package": "com.cdaguiar23.procuradoriamulherapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -29,6 +39,11 @@
     "plugins": [
       "expo-mail-composer",
       "expo-file-system"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "af62b78e-861c-42c8-a561-1c6d3861f0aa"
+      }
+    }
   }
 }

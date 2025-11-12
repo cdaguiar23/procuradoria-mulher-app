@@ -95,8 +95,8 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   logo: {
-    width: 180,
-    height: 90,
+    width: 200,
+    height: 100,
     marginBottom: 16,
     resizeMode: 'contain',
   },
