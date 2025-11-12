@@ -58,33 +58,6 @@ Este é um aplicativo móvel desenvolvido em React Native com Expo para a Procur
    - Para iOS: `npm run ios`
    - Para web: `npm run web`
 
-## 📁 Estrutura do Projeto
-
-```
-procuradoria-mulher-app/
-├── assets/                    # Imagens e recursos estáticos
-│   ├── logo_procuradoria.png
-│   ├── icon.png
-│   └── ...
-├── src/
-│   ├── screens/               # Telas do aplicativo
-│   │   ├── LoginScreen.tsx
-│   │   ├── HomeScreen.tsx
-│   │   ├── DenunciaScreen.tsx
-│   │   ├── RedeScreen.tsx
-│   │   ├── DireitosScreen.tsx
-│   │   ├── BOScreen.tsx
-│   │   ├── SobreScreen.tsx
-│   │   └── RegisterScreen.tsx
-│   └── types/                 # Definições de tipos TypeScript
-├── App.tsx                    # Componente principal da navegação
-├── index.ts                   # Ponto de entrada
-├── package.json               # Dependências e scripts
-├── app.json                   # Configurações do Expo
-├── tsconfig.json              # Configurações do TypeScript
-└── README.md                  # Este arquivo
-```
-
 ## 🎨 Design e UX
 
 O aplicativo segue um design consistente com:
